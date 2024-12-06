@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Change (RoC)</title>
+    
+    <!-- Adicionando estilo -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #7c4dff; /* Cor roxa para cabeçalho */
+            color: white;
+        }
+        td {
+            background-color: #f0f0f0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold; /* Deixando os títulos em negrito */
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        .inline-fields {
+            display: flex;
+            justify-content: space-between;
+        }
+        .inline-fields div {
+            width: 30%;
+        }
+        .topologia-container {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .image-preview {
+            margin-top: 10px;
+        }
+        .image-preview img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-top: 10px;
+        }
+        .preserve-text {
+            white-space: pre-wrap; /* Mantém a formatação do texto, incluindo quebras de linha */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro de Change (RoC)</h1>
+        <form id="rocForm">
+            <label for="overview">Overview:</label>
+            <textarea id="overview" name="overview" required></textarea>
+            
+            <!-- Campos "Número da Change", "Solicitante", "Data" lado a lado -->
+            <div class="inline-fields">
+                <div>
+                    <label for="numero_change">Número da Change:</label>
+                    <input type="text" id="numero_change" name="numero_change" required>
+                </div>
+                <div>
+                    <label for="solicitante">Solicitante:</label>
+                    <input type="text" id="solicitante" name="solicitante" required>
+                </div>
+                <div>
+                    <label for="data">Data:</label>
+                    <input type="date" id="data" name="data" required>
+                </div>
+            </div>
+
+            <!-- Seção lateral com campos Criado por, Phone, E-mail, Peer Reviewer -->
+            <div class="fields-group">
+                <div style="width: 48%;">
+                    <label for="localidade">Localidade:</label>
+                    <select id="localidade" name="localidade" multiple required>
+                        <option value="MA">MA - MARANHÃO</option>
+                        <option value="PA">PA - PARA</option>
+                        <option value="PI">PI - PIAUÍ</option>
+                        <option value="AL">AL - ALAGOAS</option>
+                        <option value="RS">RS - RIO GRANDE DO SUL</option>
+                        <option value="AP">AP - AMAPA</option>
+                        <option value="GO">GO - GOIAS</option>
+                        <option value="OUTRAS">OUTRAS...</option>
+                    </select>
+                </div>
+
+                <!-- Menu lateral -->
+                <div class="menu-lateral">
+                    <div>
+                        <label for="criado_por">Criado por:</label>
+                        <input type="text" id="criado_por" name="criado_por">
+                    </div>
+                    <div>
+                        <label for="phone">Phone:</label>
+                        <input type="text" id="phone" name="phone" value="55 11 xxxx-xxxx">
+                    </div>
+                    <div>
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    <div>
+                        <label for="peer_reviewer">Peer Reviewer/Task:</label>
+                        <input type="text" id="peer_reviewer" name="peer_reviewer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status do planejamento -->
+            <label for="status">Status do Planejamento:</label>
+            <select id="status" name="status">
+                <option value="Em andamento">Em andamento</option>
+                <option value="Concluído">Concluído</option>
+                <option value="Cancelado">Cancelado</option>
+            </select>
+
+            <!-- Avaliação de Risco -->
+            <label for="avaliacao_risco">Avaliação de Risco:</label>
+            <table id="avaliacaoRiscoTable">
+                <thead>
+                    <tr>
+                        <th>Risk (LMH)</th>
+                        <th>Impact (LMH)</th>
+                        <th>Comentários</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select name="risk">
+                                <option>Baixo</option>
+                                <option>Médio</option>
+                                <option>Alto</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="impact">
+                                <option>Baixo</option>
+                                <option>Médio</option>
+                                <option>Alto</option>
+                            </select>
+                        </td>
+                        <td><input type="text" name="comentarios" placeholder="Comentários..." /></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" onclick="addAvaliacaoRisco()">Adicionar Avaliação de Risco</button>
+
+            <!-- Dispositivos Impactados -->
+            <label for="dispositivos">Dispositivos Impactados:</label>
+            <table class="dispositivos-table" id="dispositivosTable">
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>Local</th>
+                        <th>Tipo de Dispositivo</th>
+                        <th>Tipo de Atividade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Linhas serão inseridas dinamicamente -->
+                </tbody>
+            </table>
+            <button type="button" onclick="addDispositivo()">Adicionar Dispositivo</button>
+
+            <!-- Topologia -->
+            <div class="topologia-container">
+                <h3><b>Topologia</b></h3>
+                <!-- Antes -->
+                <label for="topologiaAntes">Antes:</label>
+                <input type="file" id="topologiaAntes" accept="image/*" onchange="previewImage(this, 'previewAntes')">
+                <div class="image-preview" id="previewAntes"></div>
+
+                <!-- Depois -->
+                <label for="topologiaDepois">Depois:</label>
+                <input type="file" id="topologiaDepois" accept="image/*" onchange="previewImage(this, 'previewDepois')">
+                <div class="image-preview" id="previewDepois"></div>
+            </div>
+
+            <!-- Testes Pré-Change -->
+            <div class="testes-container">
+                <h3><b>Testes pré-change (Antes)</b></h3>
+                <label for="testesAntes">Descrição dos Testes:</label>
+                <textarea id="testesAntes" name="testesAntes" placeholder="Descreva os testes realizados antes da mudança..." required></textarea>
+                <br>
+                <label for="testesAntesArquivo">Anexar Arquivo (Imagem):</label>
+                <input type="file" id="testesAntesArquivo" name="testesAntesArquivo" accept="image/*" onchange="previewTestesAntesImage(this)">
+                <div class="image-preview" id="testesAntesPreview"></div>
+            </div>
+
+            <!-- Mudanças Aplicadas -->
+            <div class="mudancas-aplicadas">
+                <h3><b>Mudanças aplicadas</b></h3>
+                <textarea id="mudancasAplicadas" name="mudancasAplicadas" placeholder="Insira aqui o seu script de mudança ou clique aqui para anexar um arquivo" required></textarea>
+                <br>
+                <label for="mudancasAplicadasArquivo">Anexar Arquivo (Script):</label>
+                <input type="file" id="mudancasAplicadasArquivo" name="mudancasAplicadasArquivo" onchange="previewMudancasAplicadasArquivo(this)">
+                <div class="file-preview" id="mudancasPreview"></div>
+            </div>
+
+            <!-- Testes Pós-Change -->
+            <div class="testes-pós-container">
+                <h3><b>Testes pós-change (Depois)</b></h3>
+                <label for="testesDepois">Descrição dos Testes:</label>
+                <textarea id="testesDepois" name="testesDepois" placeholder="Descreva os testes realizados depois da mudança..." required></textarea>
+                <br>
+                <label for="testesDepoisArquivo">Anexar Arquivo (Imagem):</label>
+                <input type="file" id="testesDepoisArquivo" name="testesDepoisArquivo" accept="image/*" onchange="previewTestesDepoisImage(this)">
+                <div class="image-preview" id="testesDepoisPreview"></div>
+            </div>
+
+            <!-- Plano de Retorno (Rollback) -->
+            <div class="plano-retorno">
+                <h3><b>Plano de Retorno (Rollback)</b></h3>
+                <textarea id="planoRetorno" name="planoRetorno" placeholder="Insira o plano de retorno (rollback) para reverter a mudança..." required></textarea>
+            </div>
+
+            <button type="button" onclick="saveForm()">Salvar</button>
+            <button type="button" onclick="resetForm()">Começar de Novo</button>
+            <button type="button" onclick="generateHTML()">Gerar HTML</button>
+        </form>
+    </div>
+
+    <script>
+        // Função para adicionar uma linha na tabela de dispositivos
+        function addDispositivo() {
+            const table = document.getElementById('dispositivosTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            newRow.innerHTML = `
+                <td><input type="text" name="ip[]" placeholder="Digite IP" /></td>
+                <td><input type="text" name="local[]" placeholder="Digite Local" /></td>
+                <td><select><option>Selecionar</option><option>Firewall</option><option>Switch</option><option>AP</option></select></td>
+                <td><select><option>Selecionar</option><option>Configuração</option><option>Alteração</option></select></td>
+            `;
+        }
+
+        // Função para adicionar uma linha na tabela de Avaliação de Risco
+        function addAvaliacaoRisco() {
+            const table = document.getElementById('avaliacaoRiscoTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            newRow.innerHTML = `
+                <td><select name="risk">
+                    <option>Baixo</option>
+                    <option>Médio</option>
+                    <option>Alto</option>
+                </select></td>
+                <td><select name="impact">
+                    <option>Baixo</option>
+                    <option>Médio</option>
+                    <option>Alto</option>
+                </select></td>
+                <td><input type="text" name="comentarios" placeholder="Comentários..." /></td>
+            `;
+        }
+
+        // Função para visualizar imagem carregada na seção Testes Pré-Change
+        function previewTestesAntesImage(input) {
+            const previewDiv = document.getElementById('testesAntesPreview');
+            previewDiv.innerHTML = ""; // Limpar preview anterior
+
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    previewDiv.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Função para visualizar imagem carregada na seção Testes Pós-Change
+        function previewTestesDepoisImage(input) {
+            const previewDiv = document.getElementById('testesDepoisPreview');
+            previewDiv.innerHTML = ""; // Limpar preview anterior
+
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    previewDiv.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Função para visualizar imagem carregada
+        function previewImage(input, previewId) {
+            const previewDiv = document.getElementById(previewId);
+            previewDiv.innerHTML = ""; // Limpar preview anterior
+
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    previewDiv.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Função para capturar imagens como Base64
+        function getImageAsBase64(input) {
+            return new Promise((resolve) => {
+                const file = input.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                } else {
+                    resolve(""); // Caso nenhuma imagem tenha sido carregada
+                }
+            });
+        }
+
+        // Função para gerar um arquivo HTML
+        async function generateHTML() {
+            const overview = document.getElementById('overview').value;
+            const numeroChange = document.getElementById('numero_change').value;
+            const solicitante = document.getElementById('solicitante').value;
+            const data = document.getElementById('data').value;
+            const criadoPor = document.getElementById('criado_por').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const peerReviewer = document.getElementById('peer_reviewer').value;
+            const localidade = Array.from(document.getElementById('localidade').selectedOptions)
+                .map(option => option.value)
+                .join(", ");
+            const status = document.getElementById('status').value;
+            const testesAntes = document.getElementById('testesAntes').value;
+            const testesDepois = document.getElementById('testesDepois').value;
+            const mudancasAplicadas = document.getElementById('mudancasAplicadas').value;
+            const planoRetorno = document.getElementById('planoRetorno').value;
+            const topologiaAntes = await getImageAsBase64(document.getElementById('topologiaAntes'));
+            const topologiaDepois = await getImageAsBase64(document.getElementById('topologiaDepois'));
+            const testesAntesImagem = await getImageAsBase64(document.getElementById('testesAntesArquivo'));
+            const testesDepoisImagem = await getImageAsBase64(document.getElementById('testesDepoisArquivo'));
+            const mudancasAplicadasArquivo = await getImageAsBase64(document.getElementById('mudancasAplicadasArquivo'));
+
+            let htmlContent = `
+                <html>
+                    <head>
+                        <title>Registro de Change (RoC)</title>
+                        <style>
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+                            th { background-color: #7c4dff; color: white; }
+                            td { background-color: #f0f0f0; }
+                            img { max-width: 100%; height: auto; margin-top: 10px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Registro de Change (RoC)</h1>
+                        <table>
+                            <tr><th colspan="2">Resumo dos Dados</th></tr>
+                            <tr><td><strong>Overview:</strong></td><td class="preserve-text">${overview}</td></tr>
+                            <tr><td><strong>Número da Change:</strong></td><td>${numeroChange}</td></tr>
+                            <tr><td><strong>Solicitante:</strong></td><td>${solicitante}</td></tr>
+                            <tr><td><strong>Data:</strong></td><td>${data}</td></tr>
+                            <tr><td><strong>Criado por:</strong></td><td>${criadoPor}</td></tr>
+                            <tr><td><strong>Phone:</strong></td><td>${phone}</td></tr>
+                            <tr><td><strong>E-mail:</strong></td><td>${email}</td></tr>
+                            <tr><td><strong>Peer Reviewer/Task:</strong></td><td>${peerReviewer}</td></tr>
+                            <tr><td><strong>Localidade:</strong></td><td>${localidade}</td></tr>
+                            <tr><td><strong>Status do Planejamento:</strong></td><td>${status}</td></tr>
+                        </table>
+
+                        <!-- Testes Pré-Change -->
+                        <br><strong>Testes pré-change (Antes):</strong>
+                        <p class="preserve-text">${testesAntes}</p>
+                        ${testesAntesImagem ? `<h3>Imagem Testes Pré-Change (Antes):</h3><img src="${testesAntesImagem}" />` : ''}
+
+                        <!-- Testes Pós-Change -->
+                        <br><strong>Testes pós-change (Depois):</strong>
+                        <p class="preserve-text">${testesDepois}</p>
+                        ${testesDepoisImagem ? `<h3>Imagem Testes Pós-Change (Depois):</h3><img src="${testesDepoisImagem}" />` : ''}
+
+                        <!-- Mudanças Aplicadas -->
+                        <br><strong>Mudanças aplicadas:</strong>
+                        <p class="preserve-text">${mudancasAplicadas}</p>
+                        ${mudancasAplicadasArquivo ? `<h3>Arquivo Anexado de Mudanças Aplicadas:</h3><a href="${mudancasAplicadasArquivo}" download>Baixar Arquivo</a>` : ''}
+
+                        <!-- Plano de Retorno -->
+                        <br><strong>Plano de Retorno (Rollback):</strong>
+                        <p class="preserve-text">${planoRetorno}</p>
+
+                        <!-- Avaliação de Risco -->
+                        <br><strong>Avaliação de Risco:</strong>
+                        <table>
+                            <tr><th>Risk (LMH)</th><th>Impact (LMH)</th><th>Comentários</th></tr>
+            `;
+
+            // Coletar avaliação de risco
+            const riscoRows = document.getElementById('avaliacaoRiscoTable').getElementsByTagName('tbody')[0].rows;
+            for (let i = 0; i < riscoRows.length; i++) {
+                const risco = riscoRows[i].cells[0].getElementsByTagName('select')[0].value;
+                const impacto = riscoRows[i].cells[1].getElementsByTagName('select')[0].value;
+                const comentarios = riscoRows[i].cells[2].getElementsByTagName('input')[0].value;
+
+                htmlContent += `
+                    <tr>
+                        <td>${risco}</td>
+                        <td>${impacto}</td>
+                        <td>${comentarios}</td>
+                    </tr>
+                `;
+            }
+
+            htmlContent += `</table>`;
+
+            // Adicionar dispositivos impactados
+            htmlContent += `<br><strong>Dispositivos Impactados:</strong>`;
+            htmlContent += `<table>
+                <tr><th>IP</th><th>Local</th><th>Tipo de Dispositivo</th><th>Tipo de Atividade</th></tr>`;
+            const dispositivosRows = document.getElementById('dispositivosTable').getElementsByTagName('tbody')[0].rows;
+            for (let i = 0; i < dispositivosRows.length; i++) {
+                const ip = dispositivosRows[i].cells[0].getElementsByTagName('input')[0].value;
+                const local = dispositivosRows[i].cells[1].getElementsByTagName('input')[0].value;
+                const tipoDispositivo = dispositivosRows[i].cells[2].getElementsByTagName('select')[0].value;
+                const tipoAtividade = dispositivosRows[i].cells[3].getElementsByTagName('select')[0].value;
+
+                htmlContent += `
+                    <tr>
+                        <td>${ip}</td>
+                        <td>${local}</td>
+                        <td>${tipoDispositivo}</td>
+                        <td>${tipoAtividade}</td>
+                    </tr>
+                `;
+            }
+
+            htmlContent += `</table>`;
+
+            // Adicionar imagens de topologia
+            if (topologiaAntes) {
+                htmlContent += `<h3>Topologia Antes:</h3><img src="${topologiaAntes}" />`;
+            }
+            if (topologiaDepois) {
+                htmlContent += `<h3>Topologia Depois:</h3><img src="${topologiaDepois}" />`;
+            }
+
+            htmlContent += `</body></html>`;
+
+            // Criar e abrir o arquivo HTML
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'registro_change.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Função para salvar os dados e exibir um alerta
+        function saveForm() {
+            alert("Dados salvos com sucesso!");
+        }
+
+        // Função para resetar o formulário
+        function resetForm() {
+            document.getElementById("rocForm").reset();
+            document.getElementById("previewAntes").innerHTML = "";
+            document.getElementById("previewDepois").innerHTML = "";
+        }
+		
+		// Função para garantir que as quebras de linha e espaços sejam preservados
+function formatTextForHTML(text) {
+    // Substitui as quebras de linha por <br> e os espaços por &nbsp;
+    return text.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+}
+
+async function generateHTML() {
+    const overview = formatTextForHTML(document.getElementById('overview').value);
+    const numeroChange = document.getElementById('numero_change').value;
+    const solicitante = document.getElementById('solicitante').value;
+    const data = document.getElementById('data').value;
+    const criadoPor = document.getElementById('criado_por').value;
+    const phone = document.getElementById('phone').value;
+    const email = document.getElementById('email').value;
+    const peerReviewer = document.getElementById('peer_reviewer').value;
+    const localidade = Array.from(document.getElementById('localidade').selectedOptions)
+        .map(option => option.value)
+        .join(", ");
+    const status = document.getElementById('status').value;
+    const testesAntes = formatTextForHTML(document.getElementById('testesAntes').value);
+    const testesDepois = formatTextForHTML(document.getElementById('testesDepois').value);
+    const mudancasAplicadas = formatTextForHTML(document.getElementById('mudancasAplicadas').value);
+    const planoRetorno = formatTextForHTML(document.getElementById('planoRetorno').value);
+    const topologiaAntes = await getImageAsBase64(document.getElementById('topologiaAntes'));
+    const topologiaDepois = await getImageAsBase64(document.getElementById('topologiaDepois'));
+    const testesAntesImagem = await getImageAsBase64(document.getElementById('testesAntesArquivo'));
+    const testesDepoisImagem = await getImageAsBase64(document.getElementById('testesDepoisArquivo'));
+    const mudancasAplicadasArquivo = await getImageAsBase64(document.getElementById('mudancasAplicadasArquivo'));
+
+    let htmlContent = `
+        <html>
+            <head>
+                <title>Registro de Change (RoC)</title>
+                <style>
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+                    th { background-color: #7c4dff; color: white; }
+                    td { background-color: #f0f0f0; }
+                    img { max-width: 100%; height: auto; margin-top: 10px; }
+                </style>
+            </head>
+            <body>
+                <h1>Registro de Change (RoC)</h1>
+                <table>
+                    <tr><th colspan="2">Resumo dos Dados</th></tr>
+                    <tr><td><strong>Overview:</strong></td><td>${overview}</td></tr>
+                    <tr><td><strong>Número da Change:</strong></td><td>${numeroChange}</td></tr>
+                    <tr><td><strong>Solicitante:</strong></td><td>${solicitante}</td></tr>
+                    <tr><td><strong>Data:</strong></td><td>${data}</td></tr>
+                    <tr><td><strong>Criado por:</strong></td><td>${criadoPor}</td></tr>
+                    <tr><td><strong>Phone:</strong></td><td>${phone}</td></tr>
+                    <tr><td><strong>E-mail:</strong></td><td>${email}</td></tr>
+                    <tr><td><strong>Peer Reviewer/Task:</strong></td><td>${peerReviewer}</td></tr>
+                    <tr><td><strong>Localidade:</strong></td><td>${localidade}</td></tr>
+                    <tr><td><strong>Status do Planejamento:</strong></td><td>${status}</td></tr>
+                </table>
+
+                <!-- Testes Pré-Change -->
+                <br><strong>Testes pré-change (Antes):</strong>
+                <p>${testesAntes}</p>
+                ${testesAntesImagem ? `<h3>Imagem Testes Pré-Change (Antes):</h3><img src="${testesAntesImagem}" />` : ''}
+
+                <!-- Testes Pós-Change -->
+                <br><strong>Testes pós-change (Depois):</strong>
+                <p>${testesDepois}</p>
+                ${testesDepoisImagem ? `<h3>Imagem Testes Pós-Change (Depois):</h3><img src="${testesDepoisImagem}" />` : ''}
+
+                <!-- Mudanças Aplicadas -->
+                <br><strong>Mudanças aplicadas:</strong>
+                <p>${mudancasAplicadas}</p>
+                ${mudancasAplicadasArquivo ? `<h3>Arquivo Anexado de Mudanças Aplicadas:</h3><a href="${mudancasAplicadasArquivo}" download>Baixar Arquivo</a>` : ''}
+
+                <!-- Plano de Retorno -->
+                <br><strong>Plano de Retorno (Rollback):</strong>
+                <p>${planoRetorno}</p>
+
+                <!-- Avaliação de Risco -->
+                <br><strong>Avaliação de Risco:</strong>
+                <table>
+                    <tr><th>Risk (LMH)</th><th>Impact (LMH)</th><th>Comentários</th></tr>
+    `;
+
+    // Coletar avaliação de risco
+    const riscoRows = document.getElementById('avaliacaoRiscoTable').getElementsByTagName('tbody')[0].rows;
+    for (let i = 0; i < riscoRows.length; i++) {
+        const risco = riscoRows[i].cells[0].getElementsByTagName('select')[0].value;
+        const impacto = riscoRows[i].cells[1].getElementsByTagName('select')[0].value;
+        const comentarios = riscoRows[i].cells[2].getElementsByTagName('input')[0].value;
+
+        htmlContent += `
+            <tr>
+                <td>${risco}</td>
+                <td>${impacto}</td>
+                <td>${comentarios}</td>
+            </tr>
+        `;
+    }
+
+    htmlContent += `</table>`;
+
+    // Adicionar dispositivos impactados
+    htmlContent += `<br><strong>Dispositivos Impactados:</strong>`;
+    htmlContent += `<table>
+        <tr><th>IP</th><th>Local</th><th>Tipo de Dispositivo</th><th>Tipo de Atividade</th></tr>`;
+    const dispositivosRows = document.getElementById('dispositivosTable').getElementsByTagName('tbody')[0].rows;
+    for (let i = 0; i < dispositivosRows.length; i++) {
+        const ip = dispositivosRows[i].cells[0].getElementsByTagName('input')[0].value;
+        const local = dispositivosRows[i].cells[1].getElementsByTagName('input')[0].value;
+        const tipoDispositivo = dispositivosRows[i].cells[2].getElementsByTagName('select')[0].value;
+        const tipoAtividade = dispositivosRows[i].cells[3].getElementsByTagName('select')[0].value;
+
+        htmlContent += `
+            <tr>
+                <td>${ip}</td>
+                <td>${local}</td>
+                <td>${tipoDispositivo}</td>
+                <td>${tipoAtividade}</td>
+            </tr>
+        `;
+    }
+
+    htmlContent += `</table>`;
+
+    // Adicionar imagens de topologia
+    if (topologiaAntes) {
+        htmlContent += `<h3>Topologia Antes:</h3><img src="${topologiaAntes}" />`;
+    }
+    if (topologiaDepois) {
+        htmlContent += `<h3>Topologia Depois:</h3><img src="${topologiaDepois}" />`;
+    }
+
+    htmlContent += `</body></html>`;
+
+    // Criar e abrir o arquivo HTML
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'registro_change.html';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+    </script>
+</body>
+</html>
